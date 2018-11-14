@@ -27,13 +27,12 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
             return struct {
                 const Self = @This();
 
-                pub m: Matrix(T, 1, size),
+                pub data: [2]T,
 
                 pub fn init(xp: T, yp: T) Self {
-                    var mtrx: Self = undefined;
-                    mtrx.m.data[0][0] = xp;
-                    mtrx.m.data[0][1] = yp;
-                    return mtrx;
+                    return Self {
+                        .data = []T { xp, yp }
+                    };
                 }
 
                 pub fn initVal(val: T) Self {
@@ -41,19 +40,19 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                 }
 
                 pub fn x(pSelf: *const Self) T {
-                    return pSelf.m.data[0][0];
+                    return pSelf.data[0];
                 }
 
                 pub fn y(pSelf: *const Self) T {
-                    return pSelf.m.data[0][1];
+                    return pSelf.data[1];
                 }
 
                 pub fn setX(pSelf: *Self, v: T) void {
-                    pSelf.m.data[0][0] = v;
+                    pSelf.data[0] = v;
                 }
 
                 pub fn setY(pSelf: *Self, v: T) void {
-                    pSelf.m.data[0][1] = v;
+                    pSelf.data[1] = v;
                 }
 
                 pub fn eql(pSelf: *const Self, pOther: *const Self) bool {
@@ -110,14 +109,12 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
             return struct {
                 const Self = @This();
 
-                pub m: Matrix(T, 1, size),
+                pub data: [3]T,
 
                 pub fn init(xp: T, yp: T, zp: T) Self {
-                    var mtrx: Self = undefined;
-                    mtrx.m.data[0][0] = xp;
-                    mtrx.m.data[0][1] = yp;
-                    mtrx.m.data[0][2] = zp;
-                    return mtrx;
+                    return Self {
+                        .data = []T { xp, yp, zp }
+                    };
                 }
 
                 pub fn initVal(val: T) Self {
@@ -125,27 +122,27 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                 }
 
                 pub fn x(pSelf: *const Self) T {
-                    return pSelf.m.data[0][0];
+                    return pSelf.data[0];
                 }
 
                 pub fn y(pSelf: *const Self) T {
-                    return pSelf.m.data[0][1];
+                    return pSelf.data[1];
                 }
 
                 pub fn z(pSelf: *const Self) T {
-                    return pSelf.m.data[0][2];
+                    return pSelf.data[2];
                 }
 
                 pub fn setX(pSelf: *Self, v: T) void {
-                    pSelf.m.data[0][0] = v;
+                    pSelf.data[0] = v;
                 }
 
                 pub fn setY(pSelf: *Self, v: T) void {
-                    pSelf.m.data[0][1] = v;
+                    pSelf.data[1] = v;
                 }
 
                 pub fn setZ(pSelf: *Self, v: T) void {
-                    pSelf.m.data[0][2] = v;
+                    pSelf.data[2] = v;
                 }
 
                 pub fn eql(pSelf: *const Self, pOther: *const Self) bool {
@@ -269,19 +266,17 @@ pub const V3f32 = Vec(f32, 3);
 fn formatVec(
     comptime T: type,
     comptime size: usize,
-    self: *const Vec(T, size),
+    pSelf: *const Vec(T, size),
     comptime fmt: []const u8,
     context: var,
     comptime FmtError: type,
     output: fn (@typeOf(context), []const u8) FmtError!void,
 ) FmtError!void {
-    for (self.m.data) |row, i| {
-        try std.fmt.format(context, FmtError, output, "[]{}.{{ ", @typeName(T));
-        for (row) |col, j| {
-            try std.fmt.format(context, FmtError, output, "{.7}{}", col, if (j < (row.len - 1)) ", " else " ");
-        }
-        try std.fmt.format(context, FmtError, output, "}}");
+    try std.fmt.format(context, FmtError, output, "[]{} {{ ", @typeName(T));
+    for (pSelf.data) |col, i| {
+        try std.fmt.format(context, FmtError, output, "{.7}{}", col, if (i < (pSelf.data.len - 1)) ", " else " ");
     }
+    try std.fmt.format(context, FmtError, output, "}}");
 }
 
 test "vec3.init" {
@@ -394,7 +389,7 @@ test "vec2.format" {
     const v2 = Vec(f32, 2).init(2, 1);
     var result = try bufPrint(buf[0..], "v2={}", v2);
     if (DBG) warn("\nvec.format: {}\n", result);
-    assert(testExpected("v2=[]f32.{ 2.0000000, 1.0000000 }", result));
+    assert(testExpected("v2=[]f32 { 2.0000000, 1.0000000 }", result));
 }
 
 test "vec3.format" {
@@ -403,7 +398,7 @@ test "vec3.format" {
     const v3 = Vec(f32, 3).init(3, 2, 1);
     var result = try bufPrint(buf[0..], "v3={}", v3);
     if (DBG) warn("vec3.format: {}\n", result);
-    assert(testExpected("v3=[]f32.{ 3.0000000, 2.0000000, 1.0000000 }", result));
+    assert(testExpected("v3=[]f32 { 3.0000000, 2.0000000, 1.0000000 }", result));
 }
 
 test "vec3.length" {
