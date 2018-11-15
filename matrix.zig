@@ -163,6 +163,7 @@ pub fn MatrixMultiplier(comptime m1: type, comptime m2: type) type {
 pub const M44f32 = Matrix(f32, 4, 4);
 pub const m44f32_unit = M44f32.initUnit();
 pub const m44f32_zero = M44f32.initVal(0);
+pub const mulM44f32 = MatrixMultiplier(M44f32, M44f32).mul;
 
 test "matrix.init" {
     if (DBG) warn("\n");

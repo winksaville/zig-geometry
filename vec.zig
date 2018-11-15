@@ -121,6 +121,18 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     return Vec(T, size).init(val, val, val);
                 }
 
+                pub fn unitX() Self {
+                    return Self.init(1, 0, 0);
+                }
+
+                pub fn unitY() Self {
+                    return Self.init(0, 1, 0);
+                }
+
+                pub fn unitZ() Self {
+                    return Self.init(0, 0, 1);
+                }
+
                 pub fn x(pSelf: *const Self) T {
                     return pSelf.data[0];
                 }
@@ -260,6 +272,7 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
     }
 }
 
+pub const V2f32 = Vec(f32, 2);
 pub const V3f32 = Vec(f32, 3);
 
 /// Custom format routine
@@ -290,10 +303,25 @@ test "vec3.init" {
     assert(vf32.y() == 1);
     assert(vf32.z() == 1);
 
-    const v1 = Vec(f64, 3).init(1, 2, 3);
+    var v1 = V3f32.init(1, 2, 3);
     assert(v1.x() == 1);
     assert(v1.y() == 2);
     assert(v1.z() == 3);
+
+    v1 = V3f32.unitX();
+    assert(v1.x() == 1);
+    assert(v1.y() == 0);
+    assert(v1.z() == 0);
+
+    v1 = V3f32.unitY();
+    assert(v1.x() == 0);
+    assert(v1.y() == 1);
+    assert(v1.z() == 0);
+
+    v1 = V3f32.unitZ();
+    assert(v1.x() == 0);
+    assert(v1.y() == 0);
+    assert(v1.z() == 1);
 }
 
 test "vec3.copy" {
@@ -336,14 +364,14 @@ test "vec3.approxEql" {
 }
 
 test "vec2.neg" {
-    const v1 = Vec(f32, 2).init(1, 2);
-    const v2 = Vec(f32, 2).init(-1, -2);
+    const v1 = V2f32.init(1, 2);
+    const v2 = V2f32.init(-1, -2);
     assert(v2.eql(&v1.neg()));
 }
 
 test "vec3.neg" {
-    const v1 = Vec(f32, 3).init(1, 2, 3);
-    const v2 = Vec(f32, 3).init(-1, -2, -3);
+    const v1 = V3f32.init(1, 2, 3);
+    const v2 = V3f32.init(-1, -2, -3);
     assert(v2.eql(&v1.neg()));
 }
 
@@ -495,7 +523,7 @@ test "vec3.world_to_screen" {
     const zfar: T = 1.0;
     var camera_to_perspective_matrix = matrix.perspectiveM44(T, fov, aspect, znear, zfar);
 
-    var world_to_camera_matrix = matrix.M44f32.initUnit();
+    var world_to_camera_matrix = M44f32.initUnit();
     world_to_camera_matrix.data[3][2] = -2;
 
     var world_vertexs = []V3f32{
