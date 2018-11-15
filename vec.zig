@@ -68,6 +68,10 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     return Vec(T, size).init(-pSelf.x(), -pSelf.y());
                 }
 
+                pub fn scale(pSelf: *const Self, factor: T) Self {
+                    return Vec(T, size).init(pSelf.x() * factor, pSelf.y() * factor);
+                }
+
                 pub fn add(pSelf: *const Self, pOther: *const Self) Self {
                     return Vec(T, size).init((pSelf.x() + pOther.x()), (pSelf.y() + pOther.y()));
                 }
@@ -91,6 +95,31 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                         (pSelf.x() / pOther.x()),
                         (pSelf.y() / pOther.y()),
                     );
+                }
+
+                /// Returns the length as a f64, f32 or f16
+                pub fn length(pSelf: *const Self) T {
+                    return math.sqrt(pSelf.normal());
+                }
+
+                pub fn dot(pSelf: *const Self, pOther: *const Self) T {
+                    return (pSelf.x() * pOther.x()) + (pSelf.y() * pOther.y());
+                }
+
+                pub fn normal(pSelf: *const Self) T {
+                    return (pSelf.x() * pSelf.x()) + (pSelf.y() * pSelf.y());
+                }
+
+                pub fn normalize(pSelf: *const Self) Self {
+                    var len = pSelf.length();
+                    var v: Self = undefined;
+                    if (len > 0) {
+                        v.setX(pSelf.x() / len);
+                        v.setY(pSelf.y() / len);
+                    } else {
+                        v = pSelf.*;
+                    }
+                    return v;
                 }
 
                 /// Custom format routine
@@ -173,6 +202,10 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     return Vec(T, size).init(-pSelf.x(), -pSelf.y(), -pSelf.z());
                 }
 
+                pub fn scale(pSelf: *const Self, factor: T) Self {
+                    return Vec(T, size).init(pSelf.x() * factor, pSelf.y() * factor, pSelf.z() * factor);
+                }
+
                 pub fn add(pSelf: *const Self, pOther: *const Self) Self {
                     return Vec(T, size).init(
                         (pSelf.x() + pOther.x()),
@@ -205,17 +238,6 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     );
                 }
 
-                /// Custom format routine
-                pub fn format(
-                    self: *const Self,
-                    comptime fmt: []const u8,
-                    context: var,
-                    comptime FmtError: type,
-                    output: fn (@typeOf(context), []const u8) FmtError!void,
-                ) FmtError!void {
-                    try formatVec(T, size, self, fmt, context, FmtError, output);
-                }
-
                 /// Returns the length as a f64, f32 or f16
                 pub fn length(pSelf: *const Self) T {
                     return math.sqrt(pSelf.normal());
@@ -242,6 +264,17 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                         v = pSelf.*;
                     }
                     return v;
+                }
+
+                /// Custom format routine
+                pub fn format(
+                    self: *const Self,
+                    comptime fmt: []const u8,
+                    context: var,
+                    comptime FmtError: type,
+                    output: fn (@typeOf(context), []const u8) FmtError!void,
+                ) FmtError!void {
+                    try formatVec(T, size, self, fmt, context, FmtError, output);
                 }
 
                 pub fn cross(pSelf: *const Self, pOther: *const Self) Self {
@@ -375,6 +408,20 @@ test "vec3.neg" {
     assert(v2.eql(&v1.neg()));
 }
 
+test "vec2.scale" {
+    const factor = f32(0.5);
+    const v1 = V2f32.init(1, 2);
+    const v2 = V2f32.init(1 * factor, 2 * factor);
+    assert(v2.eql(&v1.scale(factor)));
+}
+
+test "vec3.scale" {
+    const factor = f32(0.5);
+    const v1 = V3f32.init(1, 2, 3);
+    const v2 = V3f32.init(1 * factor, 2 * factor, 3 * factor);
+    assert(v2.eql(&v1.scale(factor)));
+}
+
 test "vec3.add" {
     const v1 = Vec(f32, 3).init(3, 2, 1);
     const v2 = Vec(f32, 3).init(1, 2, 3);
@@ -429,9 +476,23 @@ test "vec3.format" {
     assert(testExpected("v3=[]f32 { 3.0000000, 2.0000000, 1.0000000 }", result));
 }
 
+test "vec2.length" {
+    const x = f32(3);
+    const y = f32(4);
+    const v1 = V2f32.init(x, y);
+    var len = v1.length();
+    if (DBG) warn("vec2.length: {}\n", len);
+    assert(len == math.sqrt((x * x) + (y * y)));
+}
+
 test "vec3.length" {
-    const v1 = Vec(f32, 3).init(2, 3, 4);
-    assert(v1.length() == math.sqrt(29.0));
+    const x = f32(3);
+    const y = f32(4);
+    const z = f32(5);
+    const v1 = V3f32.init(x, y, z);
+    var len = v1.length();
+    if (DBG) warn("vec3.length: {}\n", len);
+    assert(len == math.sqrt((x * x) + (y * y) + (z * z)));
 }
 
 test "vec3.dot" {
