@@ -570,7 +570,7 @@ test "vec3.transform" {
     assert(v2.approxEql(&V3f32.init(0.3846154, 0.3846154, 0.3846154), 6));
 }
 
-test "vec3.world_to_screen" {
+test "vec3.world.to.screen" {
     if (DBG) warn("\n");
     const T = f32;
     const M44 = Matrix(T, 4, 4);
@@ -585,7 +585,7 @@ test "vec3.world_to_screen" {
     var camera_to_perspective_matrix = matrix.perspectiveM44(T, fov, aspect, znear, zfar);
 
     var world_to_camera_matrix = M44f32.initUnit();
-    world_to_camera_matrix.data[3][2] = -2;
+    world_to_camera_matrix.data[3][2] = 2;
 
     var world_vertexs = []V3f32{
         V3f32.init(0, 1.0, 0),
@@ -594,22 +594,22 @@ test "vec3.world_to_screen" {
         V3f32.init(0, -1.0, -0.2),
     };
     var expected_camera_vertexs = []V3f32{
-        V3f32.init(0, 1.0, -2),
-        V3f32.init(0, -1.0, -2),
-        V3f32.init(0, 1.0, -1.8),
-        V3f32.init(0, -1.0, -2.2),
+        V3f32.init(0, 1.0, 2),
+        V3f32.init(0, -1.0, 2.0),
+        V3f32.init(0, 1.0, 2.2),
+        V3f32.init(0, -1.0, 1.8),
     };
     var expected_projected_vertexs = []V3f32{
-        V3f32.init(0, 0.5, 1.0050504),
-        V3f32.init(0, -0.5, 1.0050504),
-        V3f32.init(0, 0.5555555, 1.0044893),
-        V3f32.init(0, -0.4545454, 1.0055095),
+        V3f32.init(0, 0.5, -1.0151515),
+        V3f32.init(0, -0.5, -1.0151515),
+        V3f32.init(0, 0.4545454, -1.0146923),
+        V3f32.init(0, -0.5555555, -1.0157126),
     };
     var expected_screen_vertexs = [][2]u32{
         []u32{ 256, 128 },
         []u32{ 256, 384 },
-        []u32{ 256, 113 },
-        []u32{ 256, 372 },
+        []u32{ 256, 139 },
+        []u32{ 256, 398 },
     };
     for (world_vertexs) |world_vert, i| {
         if (DBG) warn("world_vert[{}]  = {}\n", i, &world_vert);

@@ -432,10 +432,15 @@ pub fn perspectiveM44(comptime T: type, fovDegrees: T, aspect: T, znear: T, zfar
     var scale: T = 1.0 / math.tan(T(fovDegrees * math.pi / 180.0) * 0.5);
     var q = -zfar / (zfar - znear);
 
+    // Both SharpDX and scratchapixel have data[2][3] = -1,
+    // but when I set it to -1 the image is upside down.
+    // So I've changed it to 1, I'm not exactly certain, but
+    // maybe it's because my screen's 0,0 is in the upper left
+    // corner, but could be wrong.
     return Matrix(T, 4, 4){ .data = [][4]T{
         []T{ scale / aspect, 0, 0, 0 },
         []T{ 0, scale, 0, 0 },
-        []T{ 0, 0, q, -1.0 },
+        []T{ 0, 0, q, 1.0 },
         []T{ 0, 0, q * znear, 0 },
     } };
 }
@@ -455,7 +460,7 @@ test "matrix.perspectiveM44" {
     expected.data = [][4]T{
         []T{ 1, 0, 0, 0 },
         []T{ 0, 1, 0, 0 },
-        []T{ 0, 0, -1.01010, -1 },
+        []T{ 0, 0, -1.01010, 1 },
         []T{ 0, 0, -0.01010, 0 },
     };
     assert(approxEql(&camera_to_perspective_matrix, &expected, 5));
