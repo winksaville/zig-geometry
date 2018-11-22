@@ -19,31 +19,16 @@ const V2f32 = vec.V2f32;
 
 const DBG = false;
 
+/// Builds a Yaw Pitch Roll Rotation matrix from point with x, y, z angles in radians.
+pub fn rotationYawPitchRollV3f32(point: V3f32) M44f32 {
+    return rotationYawPitchRoll(point.x(), point.y(), point.z());
+}
+
 /// Builds a Yaw Pitch Roll Rotation matrix from x, y, z angles in radians.
 pub fn rotationYawPitchRoll(x: f32, y: f32, z: f32) M44f32 {
-    const rz = M44f32{ .data = [][4]f32{
-        []f32{ math.cos(z), -math.sin(z), 0.0, 0.0 },
-        []f32{ math.sin(z), math.cos(z), 0.0, 0.0 },
-        []f32{ 0.0, 0.0, 1.0, 0.0 },
-        []f32{ 0.0, 0.0, 0.0, 1.0 },
-    } };
-    if (DBG) warn("rotationYawPitchRoll rz:\n{}", &rz);
-
-    const rx = M44f32{ .data = [][4]f32{
-        []f32{ 1.0, 0.0, 0.0, 0.0 },
-        []f32{ 0.0, math.cos(x), -math.sin(x), 0.0 },
-        []f32{ 0.0, math.sin(x), math.cos(x), 0.0 },
-        []f32{ 0.0, 0.0, 0.0, 1.0 },
-    } };
-    if (DBG) warn("rotationYawPitchRoll rx:\n{}", &rx);
-
-    const ry = M44f32{ .data = [][4]f32{
-        []f32{ math.cos(y), 0.0, math.sin(y), 0.0 },
-        []f32{ 0.0, 1.0, 0.0, 0.0 },
-        []f32{ -math.sin(y), 0.0, math.cos(y), 0.0 },
-        []f32{ 0.0, 0.0, 0.0, 1.0 },
-    } };
-    if (DBG) warn("rotationYawPitchRoll ry:\n{}", &ry);
+    const rx = RotateX(x);
+    const ry = RotateY(y);
+    const rz = RotateZ(z);
 
     var m = mulM44f32(&rz, &mulM44f32(&ry, &rx));
     if (DBG) warn("rotationYawPitchRoll m:\n{}", &m);
@@ -51,41 +36,53 @@ pub fn rotationYawPitchRoll(x: f32, y: f32, z: f32) M44f32 {
     return m;
 }
 
-pub fn rotationYawPitchRollV3f32(point: V3f32) M44f32 {
-    return rotationYawPitchRoll(point.x(), point.y(), point.z());
-}
-
 /// Builds a Yaw Pitch Roll Rotation matrix from x, y, z angles in radians.
 /// With the x, y, z applied in the opposite order then rotationYawPitchRoll.
 pub fn rotationYawPitchRollNeg(x: f32, y: f32, z: f32) M44f32 {
-    const rz = M44f32{ .data = [][4]f32{
-        []f32{ math.cos(z), -math.sin(z), 0.0, 0.0 },
-        []f32{ math.sin(z), math.cos(z), 0.0, 0.0 },
-        []f32{ 0.0, 0.0, 1.0, 0.0 },
-        []f32{ 0.0, 0.0, 0.0, 1.0 },
-    } };
-    if (DBG) warn("rotationYawPitchRollNeg rz:\n{}", &rz);
+    const rx = RotateX(x);
+    const ry = RotateY(y);
+    const rz = RotateZ(z);
 
+    var m = mulM44f32(&rx, &mulM44f32(&ry, &rz));
+    if (DBG) warn("rotationYawPitchRollNeg m:\n{}", &m);
+
+    return m;
+}
+
+// Return a `M44f32` for x axis
+fn RotateX(x: f32) M44f32 {
     const rx = M44f32{ .data = [][4]f32{
         []f32{ 1.0, 0.0, 0.0, 0.0 },
         []f32{ 0.0, math.cos(x), -math.sin(x), 0.0 },
         []f32{ 0.0, math.sin(x), math.cos(x), 0.0 },
         []f32{ 0.0, 0.0, 0.0, 1.0 },
     } };
-    if (DBG) warn("rotationYawPitchRollNeg rx:\n{}", &rx);
+    if (DBG) warn("rotationYawPitchRoll rx:\n{}", &rx);
+    return rx;
+}
 
+// Return a `M44f32` for y axis
+fn RotateY(y: f32) M44f32 {
     const ry = M44f32{ .data = [][4]f32{
         []f32{ math.cos(y), 0.0, math.sin(y), 0.0 },
         []f32{ 0.0, 1.0, 0.0, 0.0 },
         []f32{ -math.sin(y), 0.0, math.cos(y), 0.0 },
         []f32{ 0.0, 0.0, 0.0, 1.0 },
     } };
-    if (DBG) warn("rotationYawPitchRollNeg ry:\n{}", &ry);
+    if (DBG) warn("rotationYawPitchRoll ry:\n{}", &ry);
+    return ry;
+}
 
-    var m = mulM44f32(&rx, &mulM44f32(&ry, &rz));
-    if (DBG) warn("rotationYawPitchRollNeg m:\n{}", &m);
-
-    return m;
+// Return a `M44f32` for z axis
+fn RotateZ(z: f32) M44f32 {
+    const rz = M44f32{ .data = [][4]f32{
+        []f32{ math.cos(z), -math.sin(z), 0.0, 0.0 },
+        []f32{ math.sin(z), math.cos(z), 0.0, 0.0 },
+        []f32{ 0.0, 0.0, 1.0, 0.0 },
+        []f32{ 0.0, 0.0, 0.0, 1.0 },
+    } };
+    if (DBG) warn("rotationYawPitchRoll rz:\n{}", &rz);
+    return rz;
 }
 
 test "math3d.rotationYawPitchRoll" {
