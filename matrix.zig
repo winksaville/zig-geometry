@@ -317,6 +317,61 @@ test "matrix.2x2*2x2" {
     assert(m3.eql(&expected));
 }
 
+test "matrix.4x4*4x4" {
+    if (DBG) warn("\n");
+
+    var m1 = Matrix(f32, 4, 4).create();
+    m1.data = [][4]f32{
+        []f32{ 1, 2, 3, 4 },
+        []f32{ 5, 6, 7, 8 },
+        []f32{ 9, 10, 11, 12 },
+        []f32{ 13, 14, 15, 16 },
+    };
+    if (DBG) warn("matrix.4x4*4x4: m1\n{}\n", &m1);
+
+    var m2 = Matrix(f32, 4, 4).create();
+    m2.data = [][4]f32{
+        []f32{ 13, 14, 15, 16 },
+        []f32{ 9, 10, 11, 12 },
+        []f32{ 5, 6, 7, 8 },
+        []f32{ 1, 2, 3, 4 },
+    };
+    if (DBG) warn("matrix.4x4*4x4: m2\n{}\n", &m2);
+
+    const m3 = MatrixMultiplier(@typeOf(m1), @typeOf(m2)).mul(&m1, &m2);
+    if (DBG) warn("matrix.4x4*4x4: m3\n{}\n", &m3);
+
+    var expected = Matrix(f32, 4, 4).create();
+    expected.data = [][4]f32{
+        []f32{
+            (m1.data[0][0] * m2.data[0][0]) + (m1.data[0][1] * m2.data[1][0]) + (m1.data[0][2] * m2.data[2][0]) + (m1.data[0][3] * m2.data[3][0]),
+            (m1.data[0][0] * m2.data[0][1]) + (m1.data[0][1] * m2.data[1][1]) + (m1.data[0][2] * m2.data[2][1]) + (m1.data[0][3] * m2.data[3][1]),
+            (m1.data[0][0] * m2.data[0][2]) + (m1.data[0][1] * m2.data[1][2]) + (m1.data[0][2] * m2.data[2][2]) + (m1.data[0][3] * m2.data[3][2]),
+            (m1.data[0][0] * m2.data[0][3]) + (m1.data[0][1] * m2.data[1][3]) + (m1.data[0][2] * m2.data[2][3]) + (m1.data[0][3] * m2.data[3][3]),
+        },
+        []f32{
+            (m1.data[1][0] * m2.data[0][0]) + (m1.data[1][1] * m2.data[1][0]) + (m1.data[1][2] * m2.data[2][0]) + (m1.data[1][3] * m2.data[3][0]),
+            (m1.data[1][0] * m2.data[0][1]) + (m1.data[1][1] * m2.data[1][1]) + (m1.data[1][2] * m2.data[2][1]) + (m1.data[1][3] * m2.data[3][1]),
+            (m1.data[1][0] * m2.data[0][2]) + (m1.data[1][1] * m2.data[1][2]) + (m1.data[1][2] * m2.data[2][2]) + (m1.data[1][3] * m2.data[3][2]),
+            (m1.data[1][0] * m2.data[0][3]) + (m1.data[1][1] * m2.data[1][3]) + (m1.data[1][2] * m2.data[2][3]) + (m1.data[1][3] * m2.data[3][3]),
+        },
+        []f32{
+            (m1.data[2][0] * m2.data[0][0]) + (m1.data[2][1] * m2.data[1][0]) + (m1.data[2][2] * m2.data[2][0]) + (m1.data[2][3] * m2.data[3][0]),
+            (m1.data[2][0] * m2.data[0][1]) + (m1.data[2][1] * m2.data[1][1]) + (m1.data[2][2] * m2.data[2][1]) + (m1.data[2][3] * m2.data[3][1]),
+            (m1.data[2][0] * m2.data[0][2]) + (m1.data[2][1] * m2.data[1][2]) + (m1.data[2][2] * m2.data[2][2]) + (m1.data[2][3] * m2.data[3][2]),
+            (m1.data[2][0] * m2.data[0][3]) + (m1.data[2][1] * m2.data[1][3]) + (m1.data[2][2] * m2.data[2][3]) + (m1.data[2][3] * m2.data[3][3]),
+        },
+        []f32{
+            (m1.data[3][0] * m2.data[0][0]) + (m1.data[3][1] * m2.data[1][0]) + (m1.data[3][2] * m2.data[2][0]) + (m1.data[3][3] * m2.data[3][0]),
+            (m1.data[3][0] * m2.data[0][1]) + (m1.data[3][1] * m2.data[1][1]) + (m1.data[3][2] * m2.data[2][1]) + (m1.data[3][3] * m2.data[3][1]),
+            (m1.data[3][0] * m2.data[0][2]) + (m1.data[3][1] * m2.data[1][2]) + (m1.data[3][2] * m2.data[2][2]) + (m1.data[3][3] * m2.data[3][2]),
+            (m1.data[3][0] * m2.data[0][3]) + (m1.data[3][1] * m2.data[1][3]) + (m1.data[3][2] * m2.data[2][3]) + (m1.data[3][3] * m2.data[3][3]),
+        },
+    };
+    if (DBG) warn("matrix.4x4*4x4: expected\n{}\n", &expected);
+    assert(m3.eql(&expected));
+}
+
 test "matrix.1x2*2x1" {
     if (DBG) warn("\n");
 
