@@ -320,7 +320,7 @@ fn formatVec(
 ) FmtError!void {
     try std.fmt.format(context, FmtError, output, "[]{} {{ ", @typeName(T));
     for (pSelf.data) |col, i| {
-        try std.fmt.format(context, FmtError, output, "{.7}{}", col, if (i < (pSelf.data.len - 1)) ", " else " ");
+        try std.fmt.format(context, FmtError, output, "{}{.3}{}", if (math.signbit(col)) "-" else " ", if (math.signbit(col)) -col else col, if (i < (pSelf.data.len - 1)) ", " else " ");
     }
     try std.fmt.format(context, FmtError, output, "}}");
 }
@@ -464,7 +464,7 @@ test "vec2.format" {
     const v2 = Vec(f32, 2).init(2, 1);
     var result = try bufPrint(buf[0..], "v2={}", v2);
     if (DBG) warn("\nvec.format: {}\n", result);
-    assert(testExpected("v2=[]f32 { 2.0000000, 1.0000000 }", result));
+    assert(testExpected("v2=[]f32 {  2.000,  1.000 }", result));
 }
 
 test "vec3.format" {
@@ -473,7 +473,7 @@ test "vec3.format" {
     const v3 = Vec(f32, 3).init(3, 2, 1);
     var result = try bufPrint(buf[0..], "v3={}", v3);
     if (DBG) warn("vec3.format: {}\n", result);
-    assert(testExpected("v3=[]f32 { 3.0000000, 2.0000000, 1.0000000 }", result));
+    assert(testExpected("v3=[]f32 {  3.000,  2.000,  1.000 }", result));
 }
 
 test "vec2.length" {

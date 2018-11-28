@@ -87,7 +87,7 @@ pub fn Matrix(comptime T: type, comptime m: usize, comptime n: usize) type {
                 try std.fmt.format(context, FmtError, output, "[]{}.{{ ", @typeName(T));
                 for (row) |col, j| {
                     switch (@typeId(T)) {
-                        TypeId.Float => try std.fmt.format(context, FmtError, output, "{.7}{}", col, if (j < (col_cnt - 1)) ", " else " "),
+                        TypeId.Float => try std.fmt.format(context, FmtError, output, "{}{.3}{}", if (math.signbit(col)) "-" else " ", if (math.signbit(col)) -col else col, if (j < (col_cnt - 1)) ", " else " "),
                         TypeId.Int => try std.fmt.format(context, FmtError, output, "{}{}", col, if (j < (col_cnt - 1)) ", " else " "),
                         else => @compileError("Only Float and Int types are supported"),
                     }
@@ -424,16 +424,16 @@ test "matrix.format.f32" {
     const v2 = Matrix(f32, 1, 2).initVal(2);
     var result = try bufPrint(buf[0..], "v2={}", v2);
     if (DBG) warn("\nmatrix.format: {}\n", result);
-    assert(testExpected("v2=[]f32.{ 2.0000000, 2.0000000 }", result));
+    assert(testExpected("v2=[]f32.{  2.000,  2.000 }", result));
 
     const v3 = Matrix(f32, 3, 3).initVal(4);
     result = try bufPrint(buf[0..], "v3\n{}", v3);
     if (DBG) warn("matrix.format: {}\n", result);
     assert(testExpected(
         \\v3
-        \\[]f32.{ 4.0000000, 4.0000000, 4.0000000 },
-        \\[]f32.{ 4.0000000, 4.0000000, 4.0000000 },
-        \\[]f32.{ 4.0000000, 4.0000000, 4.0000000 },
+        \\[]f32.{  4.000,  4.000,  4.000 },
+        \\[]f32.{  4.000,  4.000,  4.000 },
+        \\[]f32.{  4.000,  4.000,  4.000 },
     , result));
 }
 
