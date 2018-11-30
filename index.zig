@@ -4,6 +4,7 @@ pub use @import("rotation.zig");
 pub use @import("translation.zig");
 pub use @import("lookat.zig");
 pub use @import("screencoord.zig");
+pub use @import("mesh.zig");
 
 const math = @import("std").math;
 
