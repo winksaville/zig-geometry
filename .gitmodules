@@ -1,0 +1,6 @@
+[submodule "modules/zig-approxeql"]
+	path = modules/zig-approxeql
+	url = git@github.com:winksaville/zig-approxeql
+[submodule "modules/zig-misc"]
+	path = modules/zig-misc
+	url = git@github.com:winksaville/zig-misc

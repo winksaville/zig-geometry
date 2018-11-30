@@ -11,10 +11,10 @@ const matrix = @import("matrix.zig");
 const Matrix = matrix.Matrix;
 const M44f32 = matrix.M44f32;
 const m44f32_unit = matrix.m44f32_unit;
-const ae = @import("../zig-approxeql/approxeql.zig");
+const ae = @import("modules/zig-approxeql/approxeql.zig");
 const tc = @import("typeconversions.zig");
 
-const misc = @import("../zig-misc/index.zig");
+const misc = @import("modules/zig-misc/index.zig");
 const testExpected = misc.testExpected;
 
 const DBG = false;
