@@ -19,6 +19,14 @@ pub const Face = struct {
 };
 
 pub const Vertex = struct {
+    pub fn init(x: f32, y: f32, z: f32) Vertex {
+        return Vertex{
+            .coord = V3f32.init(x, y, z),
+            .world_coord = V3f32.init(0, 0, 0),
+            .normal_coord = V3f32.init(0, 0, 0),
+        };
+    }
+
     pub coord: V3f32,
     pub world_coord: V3f32,
     pub normal_coord: V3f32,
