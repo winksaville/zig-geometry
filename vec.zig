@@ -30,9 +30,7 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                 pub data: [2]T,
 
                 pub fn init(xp: T, yp: T) Self {
-                    return Self {
-                        .data = []T { xp, yp }
-                    };
+                    return Self{ .data = []T{ xp, yp } };
                 }
 
                 pub fn initVal(val: T) Self {
@@ -141,9 +139,7 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                 pub data: [3]T,
 
                 pub fn init(xp: T, yp: T, zp: T) Self {
-                    return Self {
-                        .data = []T { xp, yp, zp }
-                    };
+                    return Self{ .data = []T{ xp, yp, zp } };
                 }
 
                 pub fn initVal(val: T) Self {

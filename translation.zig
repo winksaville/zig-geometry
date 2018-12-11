@@ -27,7 +27,7 @@ pub fn translationV3f32(vertex: geo.V3f32) geo.M44f32 {
 test "math3d.translation" {
     if (DBG) warn("\n");
     var m = translation(1, 2, 3);
-    const expected = geo.M44f32 { .data = [][4]f32{
+    const expected = geo.M44f32{ .data = [][4]f32{
         []f32{ 1.0, 0.0, 0.0, 1.0 },
         []f32{ 0.0, 1.0, 0.0, 2.0 },
         []f32{ 0.0, 0.0, 1.0, 3.0 },

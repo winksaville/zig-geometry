@@ -28,7 +28,7 @@ pub fn lookAtLh(eye: *const V3f32, target: *const V3f32, up: *const V3f32) M44f3
     var yaxis = zaxis.cross(&xaxis);
 
     // Column major order?
-    var cmo = M44f32 { .data = [][4]f32{
+    var cmo = M44f32{ .data = [][4]f32{
         []f32{ xaxis.x(), yaxis.x(), zaxis.x(), 0 },
         []f32{ xaxis.y(), yaxis.y(), zaxis.y(), 0 },
         []f32{ xaxis.z(), yaxis.z(), zaxis.z(), 0 },

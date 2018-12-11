@@ -86,8 +86,7 @@ pub fn computeVerticeNormalsDbg(comptime dbg: bool, meshes: []Mesh) void {
             msh.vertices[face.b].normal_coord = msh.vertices[face.b].normal_coord.add(&nm);
             msh.vertices[face.c].normal_coord = msh.vertices[face.c].normal_coord.add(&nm);
             if (dbg) {
-                warn("  s {}={}  {}={}  {}={}\n",
-                    face.a, msh.vertices[face.a].normal_coord, face.b, msh.vertices[face.b].normal_coord, face.c, msh.vertices[face.c].normal_coord);
+                warn("  s {}={}  {}={}  {}={}\n", face.a, msh.vertices[face.a].normal_coord, face.b, msh.vertices[face.b].normal_coord, face.c, msh.vertices[face.c].normal_coord);
             }
         }
 
@@ -124,7 +123,7 @@ test "mesh" {
     assert(mesh.rotation.data[2] == 0.0);
 
     // Unit cube about 0,0,0
-    mesh.vertices[0] = Vertex {
+    mesh.vertices[0] = Vertex{
         .coord = V3f32.init(-1, 1, 1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -132,7 +131,7 @@ test "mesh" {
     assert(mesh.vertices[0].coord.x() == -1);
     assert(mesh.vertices[0].coord.y() == 1);
     assert(mesh.vertices[0].coord.z() == 1);
-    mesh.vertices[1] = Vertex {
+    mesh.vertices[1] = Vertex{
         .coord = V3f32.init(1, 1, 1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -140,7 +139,7 @@ test "mesh" {
     assert(mesh.vertices[1].coord.x() == 1);
     assert(mesh.vertices[1].coord.y() == 1);
     assert(mesh.vertices[1].coord.z() == 1);
-    mesh.vertices[2] = Vertex {
+    mesh.vertices[2] = Vertex{
         .coord = V3f32.init(-1, -1, 1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -148,7 +147,7 @@ test "mesh" {
     assert(mesh.vertices[2].coord.x() == -1);
     assert(mesh.vertices[2].coord.y() == -1);
     assert(mesh.vertices[2].coord.z() == 1);
-    mesh.vertices[3] = Vertex {
+    mesh.vertices[3] = Vertex{
         .coord = V3f32.init(1, -1, 1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -157,7 +156,7 @@ test "mesh" {
     assert(mesh.vertices[3].coord.y() == -1);
     assert(mesh.vertices[3].coord.z() == 1);
 
-    mesh.vertices[4] = Vertex {
+    mesh.vertices[4] = Vertex{
         .coord = V3f32.init(-1, 1, -1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -165,7 +164,7 @@ test "mesh" {
     assert(mesh.vertices[4].coord.x() == -1);
     assert(mesh.vertices[4].coord.y() == 1);
     assert(mesh.vertices[4].coord.z() == -1);
-    mesh.vertices[5] = Vertex {
+    mesh.vertices[5] = Vertex{
         .coord = V3f32.init(1, 1, -1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -173,7 +172,7 @@ test "mesh" {
     assert(mesh.vertices[5].coord.x() == 1);
     assert(mesh.vertices[5].coord.y() == 1);
     assert(mesh.vertices[5].coord.z() == -1);
-    mesh.vertices[6] = Vertex {
+    mesh.vertices[6] = Vertex{
         .coord = V3f32.init(1, -1, -1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -181,7 +180,7 @@ test "mesh" {
     assert(mesh.vertices[6].coord.x() == 1);
     assert(mesh.vertices[6].coord.y() == -1);
     assert(mesh.vertices[6].coord.z() == -1);
-    mesh.vertices[7] = Vertex {
+    mesh.vertices[7] = Vertex{
         .coord = V3f32.init(-1, -1, -1),
         .world_coord = undefined,
         .normal_coord = undefined,
@@ -193,17 +192,17 @@ test "mesh" {
     // The cube has 6 side each composed
     // of 2 trianglar faces on the side
     // for 12 faces;
-    mesh.faces[0] = Face { .a=0, .b=1, .c=2, };
-    mesh.faces[1] = Face { .a=1, .b=2, .c=3, };
-    mesh.faces[2] = Face { .a=1, .b=3, .c=6, };
-    mesh.faces[3] = Face { .a=1, .b=5, .c=6, };
-    mesh.faces[4] = Face { .a=0, .b=1, .c=4, };
-    mesh.faces[5] = Face { .a=1, .b=4, .c=5, };
+    mesh.faces[0] = Face{ .a = 0, .b = 1, .c = 2 };
+    mesh.faces[1] = Face{ .a = 1, .b = 2, .c = 3 };
+    mesh.faces[2] = Face{ .a = 1, .b = 3, .c = 6 };
+    mesh.faces[3] = Face{ .a = 1, .b = 5, .c = 6 };
+    mesh.faces[4] = Face{ .a = 0, .b = 1, .c = 4 };
+    mesh.faces[5] = Face{ .a = 1, .b = 4, .c = 5 };
 
-    mesh.faces[6] = Face { .a=2, .b=3, .c=7, };
-    mesh.faces[7] = Face { .a=3, .b=6, .c=7, };
-    mesh.faces[8] = Face { .a=0, .b=2, .c=7, };
-    mesh.faces[9] = Face { .a=0, .b=4, .c=7, };
-    mesh.faces[10] = Face { .a=4, .b=5, .c=6, };
-    mesh.faces[11] = Face { .a=4, .b=6, .c=7, };
+    mesh.faces[6] = Face{ .a = 2, .b = 3, .c = 7 };
+    mesh.faces[7] = Face{ .a = 3, .b = 6, .c = 7 };
+    mesh.faces[8] = Face{ .a = 0, .b = 2, .c = 7 };
+    mesh.faces[9] = Face{ .a = 0, .b = 4, .c = 7 };
+    mesh.faces[10] = Face{ .a = 4, .b = 5, .c = 6 };
+    mesh.faces[11] = Face{ .a = 4, .b = 6, .c = 7 };
 }
