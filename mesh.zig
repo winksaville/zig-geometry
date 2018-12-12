@@ -79,7 +79,7 @@ pub fn computeVerticeNormalsDbg(comptime dbg: bool, meshes: []Mesh) void {
             var ab: V3f32 = a.sub(&b);
             var bc: V3f32 = b.sub(&c);
             var nm = ab.cross(&bc);
-            if (dbg) warn("   ab={} bc={} nm={}", ab, bc, nm);
+            if (dbg) warn("   ab={} bc={} nm={}\n", ab, bc, nm);
 
             // Sum the face normals into this faces vertices.normal_coord
             msh.vertices[face.a].normal_coord = msh.vertices[face.a].normal_coord.add(&nm);
