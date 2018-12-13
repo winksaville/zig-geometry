@@ -19,7 +19,7 @@ const pointToScreenCoord = sc.pointToScreenCoord;
 
 const DBG = false;
 
-/// Create look-at matrix
+/// Create look-at matrix "Left Hand"
 pub fn lookAtLh(eye: *const V3f32, target: *const V3f32, up: *const V3f32) M44f32 {
     if (DBG) warn("math3d.lookAtLh: eye {} target {}\n", eye, target);
 
@@ -45,6 +45,36 @@ pub fn lookAtLh(eye: *const V3f32, target: *const V3f32, up: *const V3f32) M44f3
 
     var result = cmo;
     if (DBG) warn("math3d.lookAtLh: result\n{}", &result);
+    return result;
+}
+
+/// Create look-at matrix "Right Hand"
+pub fn lookAtRh(eye: *const V3f32, target: *const V3f32, up: *const V3f32) M44f32 {
+    if (DBG) warn("math3d.lookAtRh: eye {} target {}\n", eye, target);
+
+    // This is eye - target Left Hand is target - eye
+    var zaxis = eye.sub(target).normalize();
+    var xaxis = up.cross(&zaxis).normalize();
+    var yaxis = zaxis.cross(&xaxis);
+
+    // Column major order?
+    var cmo = M44f32{ .data = [][4]f32{
+        []f32{ xaxis.x(), yaxis.x(), zaxis.x(), 0 },
+        []f32{ xaxis.y(), yaxis.y(), zaxis.y(), 0 },
+        []f32{ xaxis.z(), yaxis.z(), zaxis.z(), 0 },
+        []f32{ -xaxis.dot(eye), -yaxis.dot(eye), -zaxis.dot(eye), 1 },
+    } };
+
+    // Row major order?
+    var rmo = M44f32{ .data = [][4]f32{
+        []f32{ xaxis.x(), xaxis.y(), xaxis.z(), -xaxis.dot(eye) },
+        []f32{ yaxis.x(), yaxis.y(), yaxis.z(), -yaxis.dot(eye) },
+        []f32{ zaxis.x(), zaxis.y(), zaxis.z(), -zaxis.dot(eye) },
+        []f32{ 0, 0, 0, 1 },
+    } };
+
+    var result = cmo;
+    if (DBG) warn("math3d.lookAtRh: result\n{}", &result);
     return result;
 }
 
