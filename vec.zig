@@ -492,9 +492,12 @@ test "vec3.length" {
 }
 
 test "vec3.dot" {
+    if (DBG) warn("\n");
     const v1 = Vec(f32, 3).init(3, 2, 1);
     const v2 = Vec(f32, 3).init(1, 2, 3);
-    assert(v1.dot(&v2) == (3 * 1) + (2 * 2) + (3 * 1));
+    var d = v1.dot(&v2);
+    if (DBG) warn("d={.3}\n", d);
+    assert(d == (3 * 1) + (2 * 2) + (3 * 1));
 
     // Sqrt of the dot product of itself is the length
     assert(math.sqrt(v2.dot(&v2)) == v2.length());
@@ -524,6 +527,7 @@ test "vec3.normalize" {
 }
 
 test "vec3.cross" {
+    if (DBG) warn("\n");
     var v1 = Vec(f32, 3).init(1, 0, 0); // Unit Vector X
     var v2 = Vec(f32, 3).init(0, 1, 0); // Unit Vector Y
 
@@ -532,6 +536,17 @@ test "vec3.cross" {
     assert(v3.x() == 0);
     assert(v3.y() == 0);
     assert(v3.z() == 1);
+
+    v1 = V3f32.init(1.5, 2.5, 3.5);
+    v2 = V3f32.init(4.5, 3.5, 2.5);
+    v3 = v1.cross(&v2);
+    if (DBG) warn("v3={}\n", &v3);
+    assert(v3.eql(&V3f32.init(
+                (v1.y() * v2.z()) - (v1.z() * v2.y()),
+                (v1.z() * v2.x()) - (v1.x() * v2.z()),
+                (v1.x() * v2.y()) - (v1.y() * v2.x())
+          ))
+    );
 
     v1 = Vec(f32, 3).init(3, 2, 1);
     v2 = Vec(f32, 3).init(1, 2, 3);
