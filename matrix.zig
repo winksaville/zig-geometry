@@ -500,6 +500,24 @@ pub fn perspectiveM44(comptime T: type, fovDegrees: T, aspect: T, znear: T, zfar
     } };
 }
 
+///// From BennyQBD-3DSoftwareRenderer
+//pub fn perspectiveM44(comptime T: type, fov_degrees: T, aspect: T, znear: T, zfar: T) Matrix(T, 4, 4) {
+//    var tan_half_fov: T = math.tan(T(fov_degrees * math.pi / 180.0) * 0.5);
+//    var zrange = znear - zfar;
+//
+//    // Both SharpDX and scratchapixel have data[2][3] = -1,
+//    // but when I set it to -1 the image is upside down.
+//    // So I've changed it to 1, I'm not exactly certain, but
+//    // maybe it's because my screen's 0,0 is in the upper left
+//    // corner, but could be wrong.
+//    return Matrix(T, 4, 4){ .data = [][4]T{
+//        []T{ 1.0 / (tan_half_fov * aspect), 0, 0, 0 },
+//        []T{ 0, 1.0 / tan_half_fov, 0, 0 },
+//        []T{ 0, 0, (-znear - zfar)/zrange, 2.0 * zfar * znear / zrange },
+//        []T{ 0, 0, 1.0, 0 },
+//    } };
+//}
+
 test "matrix.perspectiveM44" {
     const T = f32;
     const M44 = Matrix(T, 4, 4);
