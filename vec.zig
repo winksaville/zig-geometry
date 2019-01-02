@@ -316,7 +316,7 @@ fn formatVec(
 ) FmtError!void {
     try std.fmt.format(context, FmtError, output, "[]{} {{ ", @typeName(T));
     for (pSelf.data) |col, i| {
-        try std.fmt.format(context, FmtError, output, "{}{.3}{}", if (math.signbit(col)) "-" else " ", if (math.signbit(col)) -col else col, if (i < (pSelf.data.len - 1)) ", " else " ");
+        try std.fmt.format(context, FmtError, output, "{}{.5}{}", if (math.signbit(col)) "-" else " ", if (math.signbit(col)) -col else col, if (i < (pSelf.data.len - 1)) ", " else " ");
     }
     try std.fmt.format(context, FmtError, output, "}}");
 }
@@ -460,7 +460,7 @@ test "vec2.format" {
     const v2 = Vec(f32, 2).init(2, 1);
     var result = try bufPrint(buf[0..], "v2={}", v2);
     if (DBG) warn("\nvec.format: {}\n", result);
-    assert(testExpected("v2=[]f32 {  2.000,  1.000 }", result));
+    assert(testExpected("v2=[]f32 {  2.00000,  1.00000 }", result));
 }
 
 test "vec3.format" {
@@ -469,7 +469,7 @@ test "vec3.format" {
     const v3 = Vec(f32, 3).init(3, 2, 1);
     var result = try bufPrint(buf[0..], "v3={}", v3);
     if (DBG) warn("vec3.format: {}\n", result);
-    assert(testExpected("v3=[]f32 {  3.000,  2.000,  1.000 }", result));
+    assert(testExpected("v3=[]f32 {  3.00000,  2.00000,  1.00000 }", result));
 }
 
 test "vec2.length" {
@@ -611,16 +611,16 @@ test "vec3.world.to.screen" {
         V3f32.init(0, -1.0, 1.8),
     };
     var expected_projected_vertexs = []V3f32{
-        V3f32.init(0, 0.5, -1.0151515),
-        V3f32.init(0, -0.5, -1.0151515),
-        V3f32.init(0, 0.4545454, -1.0146923),
-        V3f32.init(0, -0.5555555, -1.0157126),
+        V3f32.init(0, 0.30869, 1.00505),
+        V3f32.init(0, -0.30869, 1.00505),
+        V3f32.init(0, 0.28062, 1.00551),
+        V3f32.init(0, -0.34298, 1.00449),
     };
     var expected_screen_vertexs = [][2]u32{
-        []u32{ 256, 128 },
-        []u32{ 256, 384 },
-        []u32{ 256, 139 },
-        []u32{ 256, 398 },
+        []u32{ 256, 176 },
+        []u32{ 256, 335 },
+        []u32{ 256, 184 },
+        []u32{ 256, 343 },
     };
     for (world_vertexs) |world_vert, i| {
         if (DBG) warn("world_vert[{}]  = {}\n", i, &world_vert);

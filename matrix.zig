@@ -87,7 +87,7 @@ pub fn Matrix(comptime T: type, comptime m: usize, comptime n: usize) type {
                 try std.fmt.format(context, FmtError, output, "[]{}.{{ ", @typeName(T));
                 for (row) |col, j| {
                     switch (@typeId(T)) {
-                        TypeId.Float => try std.fmt.format(context, FmtError, output, "{}{.3}{}", if (math.signbit(col)) "-" else " ", if (math.signbit(col)) -col else col, if (j < (col_cnt - 1)) ", " else " "),
+                        TypeId.Float => try std.fmt.format(context, FmtError, output, "{}{.5}{}", if (math.signbit(col)) "-" else " ", if (math.signbit(col)) -col else col, if (j < (col_cnt - 1)) ", " else " "),
                         TypeId.Int => try std.fmt.format(context, FmtError, output, "{}{}", col, if (j < (col_cnt - 1)) ", " else " "),
                         else => @compileError("Only Float and Int types are supported"),
                     }
@@ -424,16 +424,16 @@ test "matrix.format.f32" {
     const v2 = Matrix(f32, 1, 2).initVal(2);
     var result = try bufPrint(buf[0..], "v2={}", v2);
     if (DBG) warn("\nmatrix.format: {}\n", result);
-    assert(testExpected("v2=[]f32.{  2.000,  2.000 }", result));
+    assert(testExpected("v2=[]f32.{  2.00000,  2.00000 }", result));
 
     const v3 = Matrix(f32, 3, 3).initVal(4);
     result = try bufPrint(buf[0..], "v3\n{}", v3);
     if (DBG) warn("matrix.format: {}\n", result);
     assert(testExpected(
         \\v3
-        \\[]f32.{  4.000,  4.000,  4.000 },
-        \\[]f32.{  4.000,  4.000,  4.000 },
-        \\[]f32.{  4.000,  4.000,  4.000 },
+        \\[]f32.{  4.00000,  4.00000,  4.00000 },
+        \\[]f32.{  4.00000,  4.00000,  4.00000 },
+        \\[]f32.{  4.00000,  4.00000,  4.00000 },
     , result));
 }
 
@@ -481,11 +481,9 @@ test "matrix.approxEql" {
 }
 
 /// Creates a perspective project matrix
-/// BasedOn: https://github.com/sharpdx/SharpDX/blob/755cb46d59f4bfb94386ff2df3fceccc511c216b/Source/SharpDX.Mathematics/Matrix.cs#L2328
-/// and: https://www.scratchapixel.com/code.php?id=4&origin=/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix
-pub fn perspectiveM44(comptime T: type, fovDegrees: T, aspect: T, znear: T, zfar: T) Matrix(T, 4, 4) {
-    var scale: T = 1.0 / math.tan(T(fovDegrees * math.pi / 180.0) * 0.5);
-    var q = -zfar / (zfar - znear);
+/// BasedOn: https://github.com/winksaville/DavrousSoftEngineTS/blob/eace0eb6954633fafa13b164ab01eb840c2184bf/SoftEngineTS/babylon.math.ts#L440
+pub fn perspectiveM44(comptime T: type, fovRadians: T, aspect: T, znear: T, zfar: T) Matrix(T, 4, 4) {
+    var tan: T = 1.0 / math.tan(T(fovRadians) * 0.5);
 
     // Both SharpDX and scratchapixel have data[2][3] = -1,
     // but when I set it to -1 the image is upside down.
@@ -493,30 +491,12 @@ pub fn perspectiveM44(comptime T: type, fovDegrees: T, aspect: T, znear: T, zfar
     // maybe it's because my screen's 0,0 is in the upper left
     // corner, but could be wrong.
     return Matrix(T, 4, 4){ .data = [][4]T{
-        []T{ scale / aspect, 0, 0, 0 },
-        []T{ 0, scale, 0, 0 },
-        []T{ 0, 0, q, 1.0 },
-        []T{ 0, 0, q * znear, 0 },
+        []T{ tan / aspect, 0, 0, 0 },
+        []T{ 0, tan, 0, 0 },
+        []T{ 0, 0, -zfar / (znear - zfar), 1.0 },
+        []T{ 0, 0, (znear * zfar) / (znear - zfar), 0 },
     } };
 }
-
-///// From BennyQBD-3DSoftwareRenderer
-//pub fn perspectiveM44(comptime T: type, fov_degrees: T, aspect: T, znear: T, zfar: T) Matrix(T, 4, 4) {
-//    var tan_half_fov: T = math.tan(T(fov_degrees * math.pi / 180.0) * 0.5);
-//    var zrange = znear - zfar;
-//
-//    // Both SharpDX and scratchapixel have data[2][3] = -1,
-//    // but when I set it to -1 the image is upside down.
-//    // So I've changed it to 1, I'm not exactly certain, but
-//    // maybe it's because my screen's 0,0 is in the upper left
-//    // corner, but could be wrong.
-//    return Matrix(T, 4, 4){ .data = [][4]T{
-//        []T{ 1.0 / (tan_half_fov * aspect), 0, 0, 0 },
-//        []T{ 0, 1.0 / tan_half_fov, 0, 0 },
-//        []T{ 0, 0, (-znear - zfar)/zrange, 2.0 * zfar * znear / zrange },
-//        []T{ 0, 0, 1.0, 0 },
-//    } };
-//}
 
 test "matrix.perspectiveM44" {
     const T = f32;
@@ -531,10 +511,11 @@ test "matrix.perspectiveM44" {
 
     var expected: M44 = undefined;
     expected.data = [][4]T{
-        []T{ 1, 0, 0, 0 },
-        []T{ 0, 1, 0, 0 },
-        []T{ 0, 0, -1.01010, 1 },
+        []T{ 0.61737, 0, 0, 0 },
+        []T{ 0, 0.61737, 0, 0 },
+        []T{ 0, 0, 1.01010, 1 },
         []T{ 0, 0, -0.01010, 0 },
     };
+    if (true) warn("matrix.perspectiveM44: camera_to_perspective_matrix:\n{}\n", &camera_to_perspective_matrix);
     assert(approxEql(&camera_to_perspective_matrix, &expected, 5));
 }
