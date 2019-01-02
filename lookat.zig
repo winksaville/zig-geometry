@@ -25,7 +25,7 @@ pub fn lookAtLh(eye: *const V3f32, target: *const V3f32, up: *const V3f32) M44f3
 
     var zaxis = target.sub(eye).normalize();
     var xaxis = up.cross(&zaxis).normalize();
-    var yaxis = zaxis.cross(&xaxis);
+    var yaxis = zaxis.cross(&xaxis).normalize();
 
     // Column major order?
     var cmo = M44f32{ .data = [][4]f32{
@@ -55,7 +55,7 @@ pub fn lookAtRh(eye: *const V3f32, target: *const V3f32, up: *const V3f32) M44f3
     // This is eye - target Left Hand is target - eye
     var zaxis = eye.sub(target).normalize();
     var xaxis = up.cross(&zaxis).normalize();
-    var yaxis = zaxis.cross(&xaxis);
+    var yaxis = zaxis.cross(&xaxis).normalize();
 
     // Column major order?
     var cmo = M44f32{ .data = [][4]f32{
