@@ -21,7 +21,7 @@ const radToDeg = degrad.radToDeg;
 
 const ae = @import("modules/zig-approxeql/approxeql.zig");
 
-const DBG = true;
+const DBG = false;
 
 /// Builds a Pitch Yaw Roll Rotation matrix from point with x, y, z angles in radians.
 pub fn rotateCwPitchYawRollV3f32(point: V3f32) M44f32 {
