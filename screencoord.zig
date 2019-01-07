@@ -21,6 +21,7 @@ pub fn pointToScreenCoord(widthf: f32, heightf: f32, pos_x: f32, pos_y: f32) V2f
     // them to coordindates where x:0, y:0 is the upper left.
     var x = (pos_x + 1) * 0.5 * widthf;
     var y = (1 - ((pos_y + 1) * 0.5)) * heightf;
+    if (DBG) warn("pointToScreenCoord:  pos_x={.3} pos_y={.3} x={.3} y={.3} widthf={.3} heightf={.3}\n", pos_x, pos_y, x, y, widthf, heightf);
     return V2f32.init(x, y);
 }
 
