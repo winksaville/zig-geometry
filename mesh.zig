@@ -16,7 +16,32 @@ pub const Face = struct {
     a: usize,
     b: usize,
     c: usize,
+    normal: V3f32,
+
+    pub fn init(a: usize, b: usize, c: usize, normal: V3f32) Face {
+        return Face {
+            .a = a, .b = b, .c = c, .normal = normal
+        };
+    }
+
+    pub fn initComputeNormal(vertexes: []const Vertex, a: usize, b: usize, c: usize) Face {
+        var normal = computeFaceNormal(vertexes, a, b, c);
+        return Face.init(a, b, c, normal);
+    }
 };
+
+pub fn computeFaceNormal(vertexes: []const Vertex, a: usize, b: usize, c: usize) V3f32 {
+    // Get the corresponding vertice coordinates
+    const v3a = vertexes[a].coord;
+    const v3b = vertexes[b].coord;
+    const v3c = vertexes[c].coord;
+
+    // Use two edges and compute the face normal and return it
+    var ab: V3f32 = v3a.sub(&v3b);
+    var bc: V3f32 = v3b.sub(&v3c);
+
+    return ab.cross(&bc);
+}
 
 pub const Vertex = struct {
     pub fn init(x: f32, y: f32, z: f32) Vertex {
@@ -70,16 +95,8 @@ pub fn computeVerticeNormalsDbg(comptime dbg: bool, meshes: []Mesh) void {
         for (msh.faces) |face| {
             if (dbg) warn(" v{}:v{}:v{}\n", face.a, face.b, face.c);
 
-            var a: V3f32 = msh.vertices[face.a].coord;
-            var b: V3f32 = msh.vertices[face.b].coord;
-            var c: V3f32 = msh.vertices[face.c].coord;
-            if (dbg) warn("    {}={}  {}={}  {}={}\n", face.a, a, face.b, b, face.c, c);
-
-            // Use two edges and compute the face normal
-            var ab: V3f32 = a.sub(&b);
-            var bc: V3f32 = b.sub(&c);
-            var nm = ab.cross(&bc);
-            if (dbg) warn("   ab={} bc={} nm={}\n", ab, bc, nm);
+            var nm = computeFaceNormal(msh.vertices, face.a, face.b, face.c);
+            if (dbg) warn(" nm={}\n", nm);
 
             // Sum the face normals into this faces vertices.normal_coord
             msh.vertices[face.a].normal_coord = msh.vertices[face.a].normal_coord.add(&nm);
@@ -192,17 +209,17 @@ test "mesh" {
     // The cube has 6 side each composed
     // of 2 trianglar faces on the side
     // for 12 faces;
-    mesh.faces[0] = Face{ .a = 0, .b = 1, .c = 2 };
-    mesh.faces[1] = Face{ .a = 1, .b = 2, .c = 3 };
-    mesh.faces[2] = Face{ .a = 1, .b = 3, .c = 6 };
-    mesh.faces[3] = Face{ .a = 1, .b = 5, .c = 6 };
-    mesh.faces[4] = Face{ .a = 0, .b = 1, .c = 4 };
-    mesh.faces[5] = Face{ .a = 1, .b = 4, .c = 5 };
+    mesh.faces[0] = Face.initComputeNormal(mesh.vertices, 0, 1, 2);
+    mesh.faces[1] = Face.initComputeNormal(mesh.vertices, 1, 2, 3);
+    mesh.faces[2] = Face.initComputeNormal(mesh.vertices, 1, 3, 6);
+    mesh.faces[3] = Face.initComputeNormal(mesh.vertices, 1, 5, 6);
+    mesh.faces[4] = Face.initComputeNormal(mesh.vertices, 0, 1, 4);
+    mesh.faces[5] = Face.initComputeNormal(mesh.vertices, 1, 4, 5);
 
-    mesh.faces[6] = Face{ .a = 2, .b = 3, .c = 7 };
-    mesh.faces[7] = Face{ .a = 3, .b = 6, .c = 7 };
-    mesh.faces[8] = Face{ .a = 0, .b = 2, .c = 7 };
-    mesh.faces[9] = Face{ .a = 0, .b = 4, .c = 7 };
-    mesh.faces[10] = Face{ .a = 4, .b = 5, .c = 6 };
-    mesh.faces[11] = Face{ .a = 4, .b = 6, .c = 7 };
+    mesh.faces[6] = Face.initComputeNormal(mesh.vertices, 2, 3, 7);
+    mesh.faces[7] = Face.initComputeNormal(mesh.vertices, 3, 6, 7);
+    mesh.faces[8] = Face.initComputeNormal(mesh.vertices, 0, 2, 7);
+    mesh.faces[9] = Face.initComputeNormal(mesh.vertices, 0, 4, 7);
+    mesh.faces[10] = Face.initComputeNormal(mesh.vertices, 4, 5, 6);
+    mesh.faces[11] = Face.initComputeNormal(mesh.vertices, 4, 6, 7);
 }
