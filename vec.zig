@@ -16,6 +16,7 @@ const tc = @import("typeconversions.zig");
 
 const misc = @import("modules/zig-misc/index.zig");
 const testExpected = misc.testExpected;
+const degToRad = @import("degrad.zig").degToRad;
 
 const DBG = false;
 
@@ -43,6 +44,11 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
 
                 pub fn y(pSelf: *const Self) T {
                     return pSelf.data[1];
+                }
+
+                pub fn set(pSelf: *Self, vx: T, vy: T) void {
+                    pSelf.setX(vx);
+                    pSelf.setY(vy);
                 }
 
                 pub fn setX(pSelf: *Self, v: T) void {
@@ -120,6 +126,13 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     return v;
                 }
 
+                // The cross product of 2D vectors returns the signed magnitude of the
+                // z component if we assume the 2D vectors are in the xy plane of a 3D
+                // coordinate space and thus each have a z component of 0.
+                pub fn cross(pSelf: *const Self, pOther: *const Self) T {
+                    return (pSelf.x() * pOther.y()) - (pSelf.y() * pOther.x());
+                }
+
                 /// Custom format routine
                 pub fn format(
                     self: *const Self,
@@ -168,6 +181,12 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
 
                 pub fn z(pSelf: *const Self) T {
                     return pSelf.data[2];
+                }
+
+                pub fn set(pSelf: *Self, vx: T, vy: T, vz: T) void {
+                    pSelf.setX(vx);
+                    pSelf.setY(vy);
+                    pSelf.setZ(vz);
                 }
 
                 pub fn setX(pSelf: *Self, v: T) void {
@@ -262,17 +281,6 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     return v;
                 }
 
-                /// Custom format routine
-                pub fn format(
-                    self: *const Self,
-                    comptime fmt: []const u8,
-                    context: var,
-                    comptime FmtError: type,
-                    output: fn (@typeOf(context), []const u8) FmtError!void,
-                ) FmtError!void {
-                    try formatVec(T, size, self, fmt, context, FmtError, output);
-                }
-
                 pub fn cross(pSelf: *const Self, pOther: *const Self) Self {
                     return Vec(T, size).init(
                         (pSelf.y() * pOther.z()) - (pSelf.z() * pOther.y()),
@@ -294,6 +302,17 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                         rw = 1.0 / rw;
                     }
                     return Self.init(rx * rw, ry * rw, rz * rw);
+                }
+
+                /// Custom format routine
+                pub fn format(
+                    self: *const Self,
+                    comptime fmt: []const u8,
+                    context: var,
+                    comptime FmtError: type,
+                    output: fn (@typeOf(context), []const u8) FmtError!void,
+                ) FmtError!void {
+                    try formatVec(T, size, self, fmt, context, FmtError, output);
                 }
             };
         },
@@ -525,6 +544,60 @@ test "vec3.normalize" {
     assert(v1.y() == 1.0 / len);
     assert(v1.z() == 1.0 / len);
 }
+
+test "vec2.cross" {
+    if (DBG) warn("\n");
+    var v3_1 = V3f32.init(1, 0, 0);
+    var v3_2 = V3f32.init(0, 1, 0);
+
+    // Calculate cross of a V3 in both dirctions
+    var v3_cross = v3_1.cross(&v3_2);
+    assert(v3_cross.x() == 0);
+    assert(v3_cross.y() == 0);
+    assert(v3_cross.z() == 1);
+
+    // Assert cross of two v2's is equal v3_cross.z()
+    var v2_1 = V2f32.init(1, 0);
+    var v2_2 = V2f32.init(0, 1);
+    assert(v2_1.cross(&v2_2) == v3_cross.z());
+    assert(v2_1.cross(&v2_2) == 1);
+
+    // Change order and the sign's will be negative
+    v3_cross = v3_2.cross(&v3_1);
+    assert(v3_cross.x() == 0);
+    assert(v3_cross.y() == 0);
+    assert(v3_cross.z() == -1);
+    assert(v2_2.cross(&v2_1) == v3_cross.z());
+    assert(v2_2.cross(&v2_1) == -1);
+
+    // Check changing both signs
+    v3_1.set(-1.0, 0.0, 0.0);
+    v3_2.set(0.0, -1.0, 0.0);
+    v2_1.set(-1.0, 0.0);
+    v2_2.set(0.0, -1.0);
+    assert(v2_1.cross(&v2_2) == v3_1.cross(&v3_2).z());
+    assert(v2_1.cross(&v2_2) == 1);
+    assert(v2_2.cross(&v2_1) == v3_2.cross(&v3_1).z());
+    assert(v2_2.cross(&v2_1) == -1);
+
+    // Check changing one sign
+    v3_1.set(-1.0, 0.0, 0.0);
+    v3_2.set(0.0, 1.0, 0.0);
+    v2_1.set(-1.0, 0.0);
+    v2_2.set(0.0, 1.0);
+    assert(v2_1.cross(&v2_2) == v3_1.cross(&v3_2).z());
+    assert(v2_1.cross(&v2_2) == -1);
+    assert(v2_2.cross(&v2_1) == v3_2.cross(&v3_1).z());
+    assert(v2_2.cross(&v2_1) == 1);
+
+    // Check you don't need unit vectors
+    v3_1.set(1.5, 1.5, 0.0);
+    v3_2.set(2.5, 1.5, 0.0);
+    v2_1.set(1.5, 1.5);
+    v2_2.set(2.5, 1.5);
+    assert(v2_1.cross(&v2_2) == v3_1.cross(&v3_2).z());
+}
+
 
 test "vec3.cross" {
     if (DBG) warn("\n");
