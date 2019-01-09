@@ -304,6 +304,16 @@ pub fn Vec(comptime T: type, comptime size: usize) type {
                     return Self.init(rx * rw, ry * rw, rz * rw);
                 }
 
+                pub fn transformNormal(pSelf: *const Self, m: *const Matrix(T, 4, 4)) Self {
+                    var vx = pSelf.x();
+                    var vy = pSelf.y();
+                    var vz = pSelf.z();
+                    const rx = (vx * m.data[0][0]) + (vy * m.data[1][0]) + (vz * m.data[2][0]);
+                    const ry = (vx * m.data[0][1]) + (vy * m.data[1][1]) + (vz * m.data[2][1]);
+                    const rz = (vx * m.data[0][2]) + (vy * m.data[1][2]) + (vz * m.data[2][2]);
+                    return Self.init(rx, ry, rz);
+                }
+
                 /// Custom format routine
                 pub fn format(
                     self: *const Self,
