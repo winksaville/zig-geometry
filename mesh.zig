@@ -62,6 +62,7 @@ pub const Vertex = struct {
 pub const Mesh = struct {
     const Self = @This();
 
+    pub pAllocator: *Allocator,
     pub name: []const u8,
     pub position: V3f32,
     pub rotation: V3f32,
@@ -70,12 +71,18 @@ pub const Mesh = struct {
 
     pub fn init(pAllocator: *Allocator, name: []const u8, vertices_count: usize, faces_count: usize) !Self {
         return Self{
+            .pAllocator = pAllocator,
             .name = name,
             .position = V3f32.init(0.0, 0.0, 0.0),
             .rotation = V3f32.init(0.0, 0.0, 0.0),
             .vertices = try pAllocator.alloc(Vertex, vertices_count),
             .faces = try pAllocator.alloc(Face, faces_count),
         };
+    }
+
+    pub fn deinit(pSelf: *Self) void {
+        pSelf.pAllocator.free(pSelf.vertices);
+        pSelf.pAllocator.free(pSelf.faces);
     }
 };
 
@@ -133,6 +140,7 @@ test "mesh" {
     var pAllocator = &arena_allocator.allocator;
 
     var mesh = try Mesh.init(pAllocator, "mesh1", 8, 12);
+    defer mesh.deinit();
     assert(std.mem.eql(u8, mesh.name[0..], "mesh1"));
     assert(mesh.position.x() == 0.0);
     assert(mesh.position.data[1] == 0.0);
